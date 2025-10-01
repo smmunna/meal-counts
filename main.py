@@ -1,3 +1,22 @@
+"""
+Meal Counts App (FastAPI)
+
+Developer: Minhazul Abedin Munna
+GitHub: https://github.com/smmunna
+LinkedIn: https://www.linkedin.com/in/minhazulabedinmunna/
+
+Description:
+This FastAPI project manages meal counts, daily deposits, bazar expenses, and session-wise monthly reports.
+All operations are date-wise and session-wise to ensure historical data integrity.
+
+Project Structure:
+- main.py        : FastAPI entry point
+- database.py    : Database connection and setup
+- models.py      : SQLAlchemy models
+- schemas.py     : Pydantic schemas
+- routers/       : Separate route modules for members, deposits, meals, bazars, sessions
+"""
+
 from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from database import Base, engine, get_db
