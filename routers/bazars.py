@@ -19,7 +19,7 @@ def add_bazar(bazar: schemas.BazarCreate, db: Session = Depends(get_db)):
         session_id=bazar.session_id,
         amount=bazar.amount,
         description=bazar.description,
-        date=bazar.date or date.today()
+        date=bazar.bazar_date or date.today()  # renamed field
     )
     db.add(db_bazar)
     db.commit()
@@ -33,11 +33,12 @@ def update_bazar(bazar_id: int, bazar: schemas.BazarUpdate, db: Session = Depend
         raise HTTPException(status_code=404, detail="Bazar record not found")
     db_bazar.amount = bazar.amount
     db_bazar.description = bazar.description
-    if bazar.date:
-        db_bazar.date = bazar.date
+    if bazar.bazar_date:
+        db_bazar.date = bazar.bazar_date
     db.commit()
     db.refresh(db_bazar)
     return db_bazar
+
 
 @router.delete("/{bazar_id}")
 def delete_bazar(bazar_id: int, db: Session = Depends(get_db)):

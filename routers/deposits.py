@@ -18,7 +18,7 @@ def create_deposit(deposit: schemas.DepositCreate, db: Session = Depends(get_db)
         member_id=deposit.member_id,
         session_id=deposit.session_id,
         amount=deposit.amount,
-        date=deposit.date or date.today()
+        date=deposit.dep_date or date.today()  # map renamed field
     )
     db.add(db_deposit)
     db.commit()
@@ -31,8 +31,8 @@ def update_deposit(deposit_id: int, deposit: schemas.DepositUpdate, db: Session 
     if not db_deposit:
         raise HTTPException(status_code=404, detail="Deposit not found")
     db_deposit.amount = deposit.amount
-    if deposit.date:
-        db_deposit.date = deposit.date
+    if deposit.dep_date:
+        db_deposit.date = deposit.dep_date
     db.commit()
     db.refresh(db_deposit)
     return db_deposit

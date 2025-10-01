@@ -18,7 +18,7 @@ def create_meal(meal: schemas.MealCreate, db: Session = Depends(get_db)):
         member_id=meal.member_id,
         session_id=meal.session_id,
         meals=meal.meals,
-        date=meal.date or date.today()
+        date=meal.meal_date or date.today()  # renamed field
     )
     db.add(db_meal)
     db.commit()
@@ -31,8 +31,8 @@ def update_meal(meal_id: int, meal: schemas.MealUpdate, db: Session = Depends(ge
     if not db_meal:
         raise HTTPException(status_code=404, detail="Meal record not found")
     db_meal.meals = meal.meals
-    if meal.date:
-        db_meal.date = meal.date
+    if meal.meal_date:
+        db_meal.date = meal.meal_date
     db.commit()
     db.refresh(db_meal)
     return db_meal

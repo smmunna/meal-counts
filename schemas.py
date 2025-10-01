@@ -1,55 +1,62 @@
 from pydantic import BaseModel
 from datetime import date
+from typing import Optional
 
-# ----- Members -----
+# ------------------------------
+# Members
+# ------------------------------
 class MemberCreate(BaseModel):
     name: str
 
 class MemberUpdate(BaseModel):
     name: str
 
-
-# ----- Sessions -----
+# ------------------------------
+# Sessions
+# ------------------------------
 class SessionCreate(BaseModel):
     name: str
-    manager: str = None
+    manager: Optional[str] = None
     start_date: date
-    end_date: date = None
+    end_date: Optional[date] = None
 
-
-# ----- Deposits -----
+# ------------------------------
+# Deposits
+# ------------------------------
 class DepositCreate(BaseModel):
     member_id: int
     session_id: int
     amount: float
-    date: date = None
+    dep_date: Optional[date] = None  # renamed
 
 class DepositUpdate(BaseModel):
     amount: float
-    date: date = None
+    dep_date: Optional[date] = None  # renamed
 
-
-# ----- Meals -----
+# ------------------------------
+# Meals
+# ------------------------------
 class MealCreate(BaseModel):
     member_id: int
     session_id: int
     meals: float
-    date: date = None
+    meal_date: Optional[date] = None  # renamed
 
 class MealUpdate(BaseModel):
     meals: float
-    date: date = None
+    meal_date: Optional[date] = None  # renamed
 
-
-# ----- Bazar -----
+# ------------------------------
+# Bazar
+# ------------------------------
 class BazarCreate(BaseModel):
     member_id: int
     session_id: int
     amount: float
     description: str = ""
-    date: date = None
+    bazar_date: Optional[date] = None  # renamed
 
 class BazarUpdate(BaseModel):
     amount: float
     description: str = ""
-    date: date = None
+    bazar_date: Optional[date] = None  # renamed

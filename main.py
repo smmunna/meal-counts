@@ -2,10 +2,11 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 import models
-from routers import members, deposits, meals, bazars, sessions, stats
+from routers import members, deposits, meals, bazars, sessions, stats, admin
 
 
-# Create all tables
+# Create all table
+# Base.metadata.drop_all(bind=engine)       # ⚠️ Deletes all existing data
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Meal Management with Daily Tracking")
@@ -17,9 +18,7 @@ app.include_router(deposits.router, prefix="/deposits", tags=["Deposits"])
 app.include_router(meals.router, prefix="/meals", tags=["Meals"])
 app.include_router(bazars.router, prefix="/bazar", tags=["Bazar"])
 app.include_router(stats.router, prefix="/stats", tags=["Stats"])
-
-
-
+app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 
 # ------------------------------
 # Clear entire table
