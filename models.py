@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -41,3 +41,16 @@ class Bazar(Base):
     description = Column(String, default="")
 
     member = relationship("Member", back_populates="bazars")  # <-- fix here
+
+
+class MealSession(Base):
+    __tablename__ = "sessions"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)  # e.g., "January 2025"
+    manager = Column(String, nullable=True)  # Meal manager's name
+    start_date = Column(Date)
+    end_date = Column(Date, nullable=True)
+
+    deposits = relationship("Deposit", back_populates="session")
+    meals = relationship("Meal", back_populates="session")
+    bazars = relationship("Bazar", back_populates="session")
