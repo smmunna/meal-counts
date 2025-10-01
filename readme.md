@@ -174,7 +174,7 @@ Make sure you have the following installed:
 Open terminal/command prompt and run:
 
 ```bash
-git clone https://github.com/yourusername/meal-project.git
+git clone https://github.com/smmunna/meal-counts.git
 ```
 
 Then navigate into the project directory:
