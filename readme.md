@@ -136,3 +136,150 @@ meal_project/
 * Fully compatible for **frontend integration**; you can generate daily and monthly reports per session.
 
 ---
+
+Absolutely! Here's a **complete guide** you can include in your README or share with your team to **download, set up, and run your Meal Counts FastAPI project from GitHub**. This assumes the project is already pushed to a GitHub repository.
+
+---
+
+# **Setup Instructions for Meal Counts App (FastAPI)**
+
+This guide will help you **clone, install, and run the Meal Counts FastAPI project** on your local machine.
+
+---
+
+## **1️⃣ Prerequisites**
+
+Make sure you have the following installed:
+
+1. **Python 3.10+** (recommended)
+
+   * Check by running:
+
+     ```bash
+     python --version
+     ```
+2. **Git**
+
+   * Check by running:
+
+     ```bash
+     git --version
+     ```
+3. **Optional**: Use a virtual environment for Python (recommended)
+
+---
+
+## **2️⃣ Clone the GitHub Repository**
+
+Open terminal/command prompt and run:
+
+```bash
+git clone https://github.com/yourusername/meal-project.git
+```
+
+Then navigate into the project directory:
+
+```bash
+cd meal-project
+```
+
+---
+
+## **3️⃣ Create a Virtual Environment (Optional but Recommended)**
+
+```bash
+python -m venv env
+```
+
+Activate the virtual environment:
+
+* **Windows:**
+
+  ```bash
+  .\env\Scripts\activate
+  ```
+* **Mac/Linux:**
+
+  ```bash
+  source env/bin/activate
+  ```
+
+---
+
+## **4️⃣ Install Dependencies**
+
+Install all required packages using **requirements.txt**:
+
+```bash
+pip install -r requirements.txt
+```
+
+**Note:** The project works with the latest package versions; no specific version is locked.
+
+---
+
+## **5️⃣ Database Setup**
+
+The project uses **SQLite**, which requires no additional installation.
+
+* The database file (`mess.db`) will be created automatically in the project root.
+* To create tables (first-time setup), FastAPI will automatically create them when you run the server.
+
+**Optional:** If you want to reset the database:
+
+```python
+# in main.py or admin endpoint
+Base.metadata.drop_all(bind=engine)
+Base.metadata.create_all(bind=engine)
+```
+
+---
+
+## **6️⃣ Run the FastAPI Server**
+
+Run the server using **uvicorn**:
+
+```bash
+uvicorn main:app --reload
+```
+
+* `--reload` automatically reloads the server when code changes.
+* Default URL: `http://127.0.0.1:8000`
+
+---
+
+## **7️⃣ Access API Documentation**
+
+FastAPI automatically generates interactive docs:
+
+1. **Swagger UI:**
+   [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+2. **Redoc:**
+   [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+
+You can test all APIs interactively.
+
+---
+
+## **9️⃣ Recommended Workflow**
+
+1. **Create a new session** → `/sessions/`
+2. **Add members** → `/members/`
+3. **Daily operations**:
+
+   * Add deposits → `/deposits/`
+   * Add meals → `/meals/`
+   * Add bazar → `/bazar/`
+4. **Update / Delete if needed** → respective PUT/DELETE APIs
+5. **Check session stats** → `/stats/meal-stats/{session_id}`
+6. **Next month** → create a new session and repeat
+
+---
+
+## **10️⃣ Notes**
+
+* All operations are **date-wise** and **session-wise**, ensuring previous months are untouched.
+* Use **clear-table** or **reset-database** endpoints carefully; they delete data permanently.
+* SQLite database file (`mess.db`) will be created in the project root automatically.
+
+---
