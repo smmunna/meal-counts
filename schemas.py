@@ -22,9 +22,11 @@ class DepositCreate(BaseModel):
     member_id: int
     session_id: int
     amount: float
+    date: date = None
 
 class DepositUpdate(BaseModel):
     amount: float
+    date: date = None
 
 
 # ----- Meals -----
@@ -32,9 +34,11 @@ class MealCreate(BaseModel):
     member_id: int
     session_id: int
     meals: float
+    date: date = None
 
 class MealUpdate(BaseModel):
     meals: float
+    date: date = None
 
 
 # ----- Bazar -----
@@ -43,7 +47,9 @@ class BazarCreate(BaseModel):
     session_id: int
     amount: float
     description: str = ""
+    date: date = None
 
 class BazarUpdate(BaseModel):
     amount: float
     description: str = ""
+    date: date = None

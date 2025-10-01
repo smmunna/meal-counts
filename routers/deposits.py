@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import date
 import models, schemas
 from database import get_db
 
-router = APIRouter(prefix="/deposit", tags=["Deposits"])
+router = APIRouter()
 
 @router.post("/")
 def create_deposit(deposit: schemas.DepositCreate, db: Session = Depends(get_db)):
@@ -13,11 +14,11 @@ def create_deposit(deposit: schemas.DepositCreate, db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="Member not found")
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
-    
     db_deposit = models.Deposit(
         member_id=deposit.member_id,
         session_id=deposit.session_id,
-        amount=deposit.amount
+        amount=deposit.amount,
+        date=deposit.date or date.today()
     )
     db.add(db_deposit)
     db.commit()
@@ -30,9 +31,11 @@ def update_deposit(deposit_id: int, deposit: schemas.DepositUpdate, db: Session 
     if not db_deposit:
         raise HTTPException(status_code=404, detail="Deposit not found")
     db_deposit.amount = deposit.amount
+    if deposit.date:
+        db_deposit.date = deposit.date
     db.commit()
     db.refresh(db_deposit)
-    return {"message": "Deposit updated", "deposit": db_deposit}
+    return db_deposit
 
 @router.delete("/{deposit_id}")
 def delete_deposit(deposit_id: int, db: Session = Depends(get_db)):

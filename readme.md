@@ -13,249 +13,96 @@ meal_project/
 │   ├── bazars.py
 │   └── sessions.py
 ```
+# Rest API list - Meal Counts App
 
-# 📌 Meal Management API Documentation
-
----
-
-## 👤 **Members**
-
-### ➕ Create Member
-
-**POST** `/members/`
-**Body:**
-
-```json
-{
-  "name": "John Doe"
-}
-```
-
-**Response:**
-
-```json
-{
-  "id": 1,
-  "name": "John Doe"
-}
-```
+ **full sequential API list** with the order in which you should call them when using this modular Meal Management project. This is essential for frontend integration and for inserting data **daily, session-wise, and monthly**.
 
 ---
 
-### ✏️ Update Member
+## **1️⃣ Sessions APIs (Create & list meal sessions)**
 
-**PUT** `/members/{member_id}`
-**Body:**
-
-```json
-{
-  "name": "John Updated"
-}
-```
-
-**Response:**
-
-```json
-{
-  "message": "Member updated",
-  "member": { "id": 1, "name": "John Updated" }
-}
-```
+| Method | Endpoint     | Body / Query                                                                                        | Description                          |
+| ------ | ------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| POST   | `/sessions/` | `{ "name": "July 2025", "manager": "Munna", "start_date": "2025-07-01", "end_date": "2025-07-31" }` | Create a new meal session (monthly). |
+| GET    | `/sessions/` | —                                                                                                   | Get all sessions.                    |
 
 ---
 
-### ❌ Delete Member
+## **2️⃣ Members APIs (Create / Update / Delete members)**
 
-**DELETE** `/members/{member_id}`
-
-Deletes member and all related deposits, meals, bazar.
-
-**Response:**
-
-```json
-{
-  "message": "Member ID 1 and all related records deleted"
-}
-```
+| Method | Endpoint               | Body                          | Description                                            |
+| ------ | ---------------------- | ----------------------------- | ------------------------------------------------------ |
+| POST   | `/members/`            | `{ "name": "Alice" }`         | Create a new member.                                   |
+| PUT    | `/members/{member_id}` | `{ "name": "Alice Updated" }` | Update member info.                                    |
+| DELETE | `/members/{member_id}` | —                             | Delete member and all related deposits, meals, bazars. |
 
 ---
 
-## 💰 **Deposits**
+## **3️⃣ Deposits APIs (Daily deposits by members)**
 
-### ➕ Add Deposit
-
-**POST** `/deposit/`
-**Body:**
-
-```json
-{
-  "member_id": 1,
-  "amount": 200
-}
-```
-
-**Response:**
-
-```json
-{
-  "id": 1,
-  "member_id": 1,
-  "amount": 200
-}
-```
+| Method | Endpoint                 | Body                                                                       | Description                                 |
+| ------ | ------------------------ | -------------------------------------------------------------------------- | ------------------------------------------- |
+| POST   | `/deposits/`             | `{ "member_id": 1, "session_id": 1, "amount": 200, "date": "2025-07-01" }` | Add deposit for a member on a specific day. |
+| PUT    | `/deposits/{deposit_id}` | `{ "amount": 300, "date": "2025-07-02" }`                                  | Update a deposit.                           |
+| DELETE | `/deposits/{deposit_id}` | —                                                                          | Delete a deposit record.                    |
 
 ---
 
-### ✏️ Update Deposit
+## **4️⃣ Meals APIs (Daily meal counts)**
 
-**PUT** `/deposit/{deposit_id}`
-**Body:**
-
-```json
-{
-  "amount": 500
-}
-```
+| Method | Endpoint           | Body                                                                      | Description              |
+| ------ | ------------------ | ------------------------------------------------------------------------- | ------------------------ |
+| POST   | `/meals/`          | `{ "member_id": 1, "session_id": 1, "meals": 2.5, "date": "2025-07-01" }` | Add daily meal count.    |
+| PUT    | `/meals/{meal_id}` | `{ "meals": 3, "date": "2025-07-02" }`                                    | Update daily meal count. |
+| DELETE | `/meals/{meal_id}` | —                                                                         | Delete a meal record.    |
 
 ---
 
-### ❌ Delete Deposit
+## **5️⃣ Bazar APIs (Daily purchases)**
 
-**DELETE** `/deposit/{deposit_id}`
-
----
-
-## 🍽️ **Meals**
-
-### ➕ Add Meal
-
-**POST** `/meal/`
-**Body:**
-
-```json
-{
-  "member_id": 1,
-  "meals": 2.5
-}
-```
+| Method | Endpoint            | Body                                                                                                    | Description                |
+| ------ | ------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------- |
+| POST   | `/bazar/`           | `{ "member_id": 1, "session_id": 1, "amount": 500, "description": "Vegetables", "date": "2025-07-01" }` | Add a daily bazar expense. |
+| PUT    | `/bazar/{bazar_id}` | `{ "amount": 600, "description": "Full Bazar", "date": "2025-07-02" }`                                  | Update bazar record.       |
+| DELETE | `/bazar/{bazar_id}` | —                                                                                                       | Delete a bazar record.     |
 
 ---
 
-### ✏️ Update Meal
+## **6️⃣ Stats API (Session-based calculations)**
 
-**PUT** `/meal/{meal_id}`
-**Body:**
-
-```json
-{
-  "meals": 3.0
-}
-```
+| Method | Endpoint                         | Query / Params   | Description                                                                                     |
+| ------ | -------------------------------- | ---------------- | ----------------------------------------------------------------------------------------------- |
+| GET    | `/stats/meal-stats/{session_id}` | `session_id` = 1 | Get total deposits, meals, bazar, meal rate, in-hand per member, overall in-hand for a session. |
 
 ---
 
-### ❌ Delete Meal
+## **7️⃣ Optional: Clear table APIs**
 
-**DELETE** `/meal/{meal_id}`
+| Method | Endpoint                    | Query                     | Description                                                                           |
+| ------ | --------------------------- | ------------------------- | ------------------------------------------------------------------------------------- |
+| DELETE | `/clear-table/{table_name}` | Optional: `?session_id=1` | Delete all records in a table. For deposits, meals, bazar, you can filter by session. |
 
----
+**`table_name` values:** `"members"`, `"deposits"`, `"meals"`, `"bazar"`
 
-## 🛒 **Bazar (Expenses)**
-
-### ➕ Add Bazar
-
-**POST** `/bazar/`
-**Body:**
-
-```json
-{
-  "member_id": 1,
-  "amount": 1000,
-  "description": "Vegetables and rice"
-}
-```
+* Example: `/clear-table/meals?session_id=1` → clears all meals in session 1.
 
 ---
 
-### ✏️ Update Bazar
+### ✅ **Recommended Workflow / Sequence**
 
-**PUT** `/bazar/{bazar_id}`
-**Body:**
+1. **Create a session** → `/sessions/`
+2. **Add members** → `/members/`
+3. **Daily operations**:
 
-```json
-{
-  "amount": 1200,
-  "description": "Updated expense"
-}
-```
-
----
-
-### ❌ Delete Bazar
-
-**DELETE** `/bazar/{bazar_id}`
+   * Add deposits → `/deposits/`
+   * Add meals → `/meals/`
+   * Add bazar → `/bazar/`
+4. **Update / Delete if needed** → respective PUT/DELETE APIs
+5. **Check monthly stats** → `/stats/meal-stats/{session_id}`
+6. **Start next month** → create a new session, repeat workflow
 
 ---
 
-## 📊 **Statistics**
-
-### 🔍 Get Meal Stats
-
-**GET** `/meal-stats/`
-
-**Response Example:**
-
-```json
-{
-  "total_bazar": 3000,
-  "total_deposit": 3200,
-  "total_meals": 60,
-  "total_meal_cost": 3000,
-  "meal_rate": 50.0,
-  "overall_in_hand": 200,
-  "members": [
-    {
-      "name": "John Doe",
-      "deposit": 1200,
-      "meals": 25,
-      "meal_cost": 1250,
-      "in_hand": -50
-    },
-    {
-      "name": "Jane Doe",
-      "deposit": 1000,
-      "meals": 20,
-      "meal_cost": 1000,
-      "in_hand": 0
-    }
-  ]
-}
-```
-
----
-
-## 🗑️ **Utility APIs**
-
-### ❌ Clear Entire Table
-
-**DELETE** `/clear-table/{table_name}`
-
-Example:
-
-```
-DELETE /clear-table/members
-```
-
-**Valid table names:** `members`, `deposits`, `meals`, `bazar`
-
----
-
-✅ This list should cover **everything you need** for your frontend.
-You can use it to build:
-
-* A **dashboard** (meal stats, overall balance)
-* A **member management UI** (add/update/delete members)
-* Deposit/Meal/Bazar tracking forms
-* A reset/clear system
+This **sequence ensures no old data interferes**, daily deposits, meals, and bazar are tracked with dates, and monthly reports can be generated **at any time**.
 
 ---
