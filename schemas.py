@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import date
 
 # ----- Members -----
 class MemberCreate(BaseModel):
@@ -8,9 +9,18 @@ class MemberUpdate(BaseModel):
     name: str
 
 
+# ----- Sessions -----
+class SessionCreate(BaseModel):
+    name: str
+    manager: str = None
+    start_date: date
+    end_date: date = None
+
+
 # ----- Deposits -----
 class DepositCreate(BaseModel):
     member_id: int
+    session_id: int
     amount: float
 
 class DepositUpdate(BaseModel):
@@ -20,6 +30,7 @@ class DepositUpdate(BaseModel):
 # ----- Meals -----
 class MealCreate(BaseModel):
     member_id: int
+    session_id: int
     meals: float
 
 class MealUpdate(BaseModel):
@@ -29,6 +40,7 @@ class MealUpdate(BaseModel):
 # ----- Bazar -----
 class BazarCreate(BaseModel):
     member_id: int
+    session_id: int
     amount: float
     description: str = ""
 

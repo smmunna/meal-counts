@@ -8,9 +8,18 @@ router = APIRouter(prefix="/bazar", tags=["Bazar"])
 @router.post("/")
 def add_bazar(bazar: schemas.BazarCreate, db: Session = Depends(get_db)):
     member = db.query(models.Member).filter(models.Member.id == bazar.member_id).first()
+    session = db.query(models.MealSession).filter(models.MealSession.id == bazar.session_id).first()
     if not member:
         raise HTTPException(status_code=404, detail="Member not found")
-    db_bazar = models.Bazar(member_id=bazar.member_id, amount=bazar.amount, description=bazar.description)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    db_bazar = models.Bazar(
+        member_id=bazar.member_id,
+        session_id=bazar.session_id,
+        amount=bazar.amount,
+        description=bazar.description
+    )
     db.add(db_bazar)
     db.commit()
     db.refresh(db_bazar)

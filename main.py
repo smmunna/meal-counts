@@ -1,37 +1,41 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 import models
-from routers import members, deposits, meals, bazars
+from routers import members, deposits, meals, bazars, sessions
 
 # Create tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Meal Management API")
+app = FastAPI(title="Meal Management with Sessions")
 
-# Routers
+# Include routers
 app.include_router(members.router)
 app.include_router(deposits.router)
 app.include_router(meals.router)
 app.include_router(bazars.router)
+app.include_router(sessions.router)
 
 # ------------------------------
-# Meal Stats
+# Meal Stats per Session
 # ------------------------------
-@app.get("/meal-stats/")
-def meal_stats(db: Session = Depends(get_db)):
+@app.get("/stats/meal-stats/{session_id}")
+def meal_stats(session_id: int, db: Session = Depends(get_db)):
     members = db.query(models.Member).all()
-    total_bazar = sum(b.amount for b in db.query(models.Bazar).all())
-    total_deposit = sum(d.amount for d in db.query(models.Deposit).all())
-    total_meals = sum(sum(me.meals for me in m.meals) for m in members)
+    session = db.query(models.MealSession).filter(models.MealSession.id == session_id).first()
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
 
+    total_bazar = sum(b.amount for b in session.bazars)
+    total_deposit = sum(d.amount for d in session.deposits)
+    total_meals = sum(sum(me.meals for me in m.meals if me.session_id==session_id) for m in members)
     meal_rate = total_bazar / total_meals if total_meals > 0 else 0
     total_meal_cost = total_meals * meal_rate
 
     results, overall_in_hand = [], 0
     for m in members:
-        member_deposit = sum(d.amount for d in m.deposits)
-        member_meals = sum(me.meals for me in m.meals)
+        member_deposit = sum(d.amount for d in m.deposits if d.session_id==session_id)
+        member_meals = sum(me.meals for me in m.meals if me.session_id==session_id)
         meal_cost = member_meals * meal_rate
         in_hand = member_deposit - meal_cost
         overall_in_hand += in_hand
@@ -44,6 +48,8 @@ def meal_stats(db: Session = Depends(get_db)):
         })
 
     return {
+        "session": session.name,
+        "manager": session.manager,
         "total_bazar": round(total_bazar, 2),
         "total_deposit": round(total_deposit, 2),
         "total_meals": round(total_meals, 2),
@@ -57,26 +63,11 @@ def meal_stats(db: Session = Depends(get_db)):
 # Clear entire table
 # ------------------------------
 @app.delete("/clear-table/{table_name}")
-def clear_table(table_name: str, db: Session = Depends(get_db)):
-    table_map = {
-        "members": models.Member,
-        "deposits": models.Deposit,
-        "meals": models.Meal,
-        "bazar": models.Bazar
-    }
-    if table_name not in table_map:
-        raise HTTPException(status_code=400, detail="Invalid table name")
-    db.query(table_map[table_name]).delete()
-    db.commit()
-    return {"message": f"All records in table '{table_name}' deleted"}
-
-
-# ------------------------------
-# Clear entire table
-# ------------------------------
-
-@app.delete("/clear-table/{table_name}")
-def clear_table(table_name: str, db: Session = Depends(get_db)):
+def clear_table(
+    table_name: str,
+    session_id: int = Query(None, description="Optional: ID of session to clear"),
+    db: Session = Depends(get_db)
+):
     table_map = {
         "members": models.Member,
         "deposits": models.Deposit,
@@ -86,6 +77,19 @@ def clear_table(table_name: str, db: Session = Depends(get_db)):
     if table_name not in table_map:
         raise HTTPException(status_code=400, detail="Invalid table name")
     
-    db.query(table_map[table_name]).delete()
+    Model = table_map[table_name]
+
+    if session_id and table_name in ["deposits", "meals", "bazar"]:
+        # Only delete records for the given session
+        deleted_count = db.query(Model).filter(Model.session_id == session_id).delete()
+    elif session_id and table_name == "members":
+        raise HTTPException(status_code=400, detail="Cannot clear members by session")
+    else:
+        # Delete all records in table
+        deleted_count = db.query(Model).delete()
+    
     db.commit()
-    return {"message": f"All records in table '{table_name}' have been deleted"}
+    return {
+        "message": f"Deleted {deleted_count} records from table '{table_name}'"
+        + (f" for session ID {session_id}" if session_id else "")
+    }

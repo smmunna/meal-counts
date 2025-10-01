@@ -8,9 +8,17 @@ router = APIRouter(prefix="/deposit", tags=["Deposits"])
 @router.post("/")
 def create_deposit(deposit: schemas.DepositCreate, db: Session = Depends(get_db)):
     member = db.query(models.Member).filter(models.Member.id == deposit.member_id).first()
+    session = db.query(models.MealSession).filter(models.MealSession.id == deposit.session_id).first()
     if not member:
         raise HTTPException(status_code=404, detail="Member not found")
-    db_deposit = models.Deposit(member_id=deposit.member_id, amount=deposit.amount)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    db_deposit = models.Deposit(
+        member_id=deposit.member_id,
+        session_id=deposit.session_id,
+        amount=deposit.amount
+    )
     db.add(db_deposit)
     db.commit()
     db.refresh(db_deposit)
